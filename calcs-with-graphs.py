@@ -141,7 +141,7 @@ for i in measure_num:
             coverr = np.sqrt(np.diag(covar))
             l_error = coverr[1]
             print(l, l_error)
-            """# PLOT CO2
+            # PLOT CO2
             color = 'tab:blue'
             plt.fig1 = plt.figure(1, figsize=(7, 5.5))
             y1 = exponential(sliced_x, a + coverr[0], l + coverr[1], c + coverr[2])
@@ -173,16 +173,16 @@ for i in measure_num:
             plt.f1.tick_params(axis="x", which="minor", labelsize=8)
             plt.ylabel('Fit residuals', color=color)
             plt.tick_params(axis='y', labelcolor=color)
-            plt.show()"""
+            plt.show()
 
             # Save data for when decay periods overlap so it can be plotted
             st = increment[0]
             ed = increment[-1]
-            gas_decay_list.append([decay_counter, st, ed, l, increment, gas_conc[i - amt_decrease:i], l_error])  # chunk
+            gas_decay_list.append([decay_counter, st, ed, l, increment, gas_conc[i - amt_decrease:i], l_error])
         amt_decrease = 0
         increment = []
         continue
-print("BLANK BLANK BLANK")
+
 # Decrement in temperature data
 amt_decrease2 = 0
 increment2 = []
@@ -219,7 +219,7 @@ for i in measure_num2:
             coverr = np.sqrt(np.diag(covar))
             k_error = coverr[1]
             print(k, k_error)
-            """# PLOT TEMP
+            # PLOT TEMP
             color = 'tab:red'
             plt.fig1 = plt.figure(1, figsize=(7, 5.5))
             y1 = exponential(sliced_t, b + coverr[0], k + coverr[1], d + coverr[2])
@@ -251,7 +251,7 @@ for i in measure_num2:
             plt.f1.tick_params(axis="x", which="minor", labelsize=8)
             plt.ylabel('Fit residuals', color=color)
             plt.tick_params(axis='y', labelcolor=color)
-            plt.show()"""
+            plt.show()
 
             # Save data
             st = increment2[0]
@@ -261,7 +261,6 @@ for i in measure_num2:
         increment2 = []
         continue
 
-ibetchawannaknow = 0
 # Checking for intersections in the decays for each decay period
 for i in gas_decay_list:
     tA = i
@@ -271,8 +270,6 @@ for i in gas_decay_list:
         hdecayID = j[0]
         intersection = date_intersection(tA, tB)
         if intersection:        # check if list has elements in it
-            ibetchawannaknow =+ 1
-            # Potentially add in a "percentage" of union that is acceptable
             # Retrieve decay coefficients for respective decays
             for m in gas_decay_list:
                 if m[0] == gdecayID:
@@ -282,20 +279,20 @@ for i in gas_decay_list:
                 if n[0] == hdecayID:
                     kappa = n[3]
                     kappa_err = n[6]
-            # Calculate U-value
+            ## Calculate U-value
             # Monte Carlo analysis of variables
             N = 1000
             sim = np.zeros(N)
             for i in range(N):
                 sim[i] = randomize_U()
-            # Get rid of large errors and save mean/ standard deviation
+
             if np.std(sim) < 5:
                 U_err = np.std(sim)
                 U_avg = np.average(sim)
-                # New equation for U-value
-                U_val_list.append(U_avg)  # add mean U-value to a list for plotting
-                U_val_errors.append(U_err)  # add the error for that calculation to a list for plotting
-            """fig, ax1 = plt.subplots()
+                U_val_list.append(U_avg) 
+                U_val_errors.append(U_err)
+                
+            fig, ax1 = plt.subplots()
             ax1.hist(sim, color="lightgray", label="Simulation output")
             plt.vlines(U_avg, 0, 270, color="#900C8D", linestyles='dashed', label=f"Mean: {U_avg:.2f}")
             plt.vlines(U_avg + U_err, 0, 200, color="#900C8D", linestyles=(0, (1, 1)),
@@ -310,9 +307,10 @@ for i in gas_decay_list:
             plt.ylabel("Probability")
             plt.legend(loc='upper right', fontsize='medium')
             plt.tight_layout()
-            plt.show()"""
+            plt.show()
 
-            # Plot the intersection of both decays, retrieve data directly from csv file
+            ## Plot the intersection of both decays
+            # Retrieve data directly from csv file
             with open('BH_co2_data.csv', 'r') as co2_file:
                 csv_reader = csv.reader(co2_file, delimiter=',')
                 for row in csv_reader:
@@ -327,7 +325,7 @@ for i in gas_decay_list:
                         st_temp = int(row[0])         # the start temp is equal to row number
                     if row[1] == datetime.strftime(intersection[1], "%d/%m/%Y %H:%M"):
                         ed_temp = int(row[0])
-            """# Plot intersection of decays
+            # Plot intersection of decays
             fig, ax1 = plt.subplots()
             color = 'tab:blue'
             ax1.set_xlabel('DateTime', fontweight='bold')
@@ -341,7 +339,7 @@ for i in gas_decay_list:
             ax2.tick_params(axis='y', labelcolor=color)
             ax2.plot(time_day2[st_temp:ed_temp], temperature[st_temp:ed_temp], color=color)
 
-            # format the ticks
+            # format ticks
             ax1.xaxis.set_minor_locator(mdates.HourLocator(byhour=(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22)))
             ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%H:%M'))
             ax1.xaxis.set_major_locator(mdates.DayLocator())
@@ -350,18 +348,18 @@ for i in gas_decay_list:
             ax1.tick_params(axis="x", which="major", pad=10)
             ax1.tick_params(axis="x", which="minor", labelsize=8)
             fig.tight_layout()
-            plt.show()"""
+            plt.show()
         continue        # go back and iterate to check for any other overlap in the intersection
     continue        # continue looping for all intersections
 U_tot_avg = sum(U_val_list) / len(U_val_list)
 U_tot_err = sum(U_val_errors) / len(U_val_errors)
 print(U_tot_avg, U_tot_err)
 
-"""# Figure out error for U-value calculation
+# Find error of individual U-value calculations
 measures = np.arange(start=1, stop=len(U_val_list)+1, step=1)
 values =  np.array(U_val_list)
 errors = np.array(U_val_errors)
-# Plot figure of U-values as compared to average value
+# Plot figure of U-values as compared to an estimated U-value
 fig, ax = plt.subplots(figsize=(7, 4))
 est_err = avg_u * 2        # 200 % error from estimate on plot
 plt.hlines(avg_u, 1, len(U_val_list), 'grey', label="Estimated room U-value")
@@ -373,4 +371,4 @@ plt.ylabel("U-value, W/m²K")
 ax.xaxis.set_major_locator(MultipleLocator(5))
 ax.xaxis.set_minor_locator(MultipleLocator(1))
 plt.legend(loc='best', fontsize='small')
-plt.show()"""
+plt.show()
